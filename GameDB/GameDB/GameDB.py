@@ -3,10 +3,6 @@ import sqlite3
 
 # -------------------Context Manager-------------------
 class DatabaseContextManager(object):
-    """This class exists for us to use less lines of code than necessary for queries.
-        __init__: used to set database file name.
-        __enter__: opens connection and creates cursor.
-        __exit__: commits the changes to database file and closes connection."""
 
     def __init__(self, path):
         self.path = path
@@ -20,13 +16,14 @@ class DatabaseContextManager(object):
         self.connection.commit()
         self.connection.close()
 
+
 # ------------------------Table Creation------------------------
 def create_table_studios():
     query = """CREATE TABLE IF NOT EXISTS Studios(
     studio_id INTEGER PRIMARY KEY AUTOINCREMENT,
     studio_name TEXT,
     employee_count INTEGER)"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
@@ -35,7 +32,7 @@ def create_table_publishers():
     publisher_id INTEGER PRIMARY KEY AUTOINCREMENT,
     publisher_name TEXT,
     games_published INTEGER)"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
@@ -48,7 +45,7 @@ def create_table_games():
     genre TEXT,
     FOREIGN KEY (publisher_id) REFERENCES Publishers(publisher_id),
     FOREIGN KEY (studio_id) REFERENCES Studios(studio_id))"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
@@ -57,7 +54,7 @@ def create_table_wallets():
     wallet_id INTEGER PRIMARY KEY AUTOINCREMENT,
     payment_method TEXT,
     balance INTEGER)"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
@@ -69,7 +66,7 @@ def create_table_users():
     user_level INTEGER,
     games_owned INTEGER,
     FOREIGN KEY (wallet_id) REFERENCES Wallets(wallet_id))"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
@@ -82,172 +79,319 @@ def create_table_orders():
     price INTEGER,
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
     FOREIGN KEY (game_id) REFERENCES Games(game_id))"""
-    with DatabaseContextManager("db") as db:
-        db.execute(query)
-
-
-# ------------------------OldTableCreation------------------------
-def create_table_products():
-    query = """CREATE TABLE IF NOT EXISTS Products(
-    product_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    price INTEGER,
-    description TEXT)"""
-    with DatabaseContextManager("db") as db:
-        db.execute(query)
-
-
-def create_table_orders():
-    query = """CREATE TABLE IF NOT EXISTS Orders(
-    order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTEGER,
-    product_id INTEGER,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id),
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id))"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
 
 
 # ------------------------CRUD------------------------
-# ----------------------Customers---------------------
-def create_customers(first_name: str, second_name: str, amount_spend: int):
-    query = """INSERT INTO Customers(first_name, second_name, amount_spend) VALUES(?,?,?)"""
-    params = [first_name, second_name, amount_spend]
-    with DatabaseContextManager("db") as db:
+# -----------------------Studios----------------------
+def create_studio(studio_name: str, employee_count: int):
+    query = """INSERT INTO Studios(studio_name, employee_count) VALUES(?,?)"""
+    params = [studio_name, employee_count]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def get_customers():
-    query = """SELECT * FROM Customers"""
-    with DatabaseContextManager("db") as db:
+def get_studios():
+    query = """SELECT * FROM Studios"""
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
         for record in db.fetchall():
             print(record)
             print("------------------------------------------------------")
 
 
-def update_customer(old_name, new_name):
-    query = """UPDATE Customers
-                SET first_name = ?
-                WHERE first_name = ?"""
-    params = [new_name, old_name]
-    with DatabaseContextManager("db") as db:
+def update_studio(old_employee_count, new_employee_count):
+    query = """UPDATE Studios
+                SET employee_count = ?
+                WHERE employee_count = ?"""
+    params = [new_employee_count, old_employee_count]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def delete_customer(customer_id: int):
-    query = """DELETE FROM Customers
-                WHERE customer_id = ?"""
-    params = [customer_id]
-    with DatabaseContextManager("db") as db:
+def delete_studio(studio_id: int):
+    query = """DELETE FROM Studios
+                WHERE studio_id = ?"""
+    params = [studio_id]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-# ----------------------Products---------------------
-def create_product(name: str, price: int, description: str):
-    query = """INSERT INTO Products(name, price, description) VALUES(?,?,?)"""
-    params = [name, price, description]
-    with DatabaseContextManager("db") as db:
+# ---------------------Publishers---------------------
+def create_publisher(publisher_name: str, games_published: int):
+    query = """INSERT INTO Publishers(publisher_name, games_published) VALUES(?,?)"""
+    params = [publisher_name, games_published]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def get_products():
-    query = """SELECT * FROM Products"""
-    with DatabaseContextManager("db") as db:
+def get_publishers():
+    query = """SELECT * FROM Publishers"""
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
         for record in db.fetchall():
             print(record)
             print("------------------------------------------------------")
 
 
-def update_product(old_name: str, new_name: str):
-    query = """UPDATE Products
-                SET name = ?
-                WHERE name = ?"""
-    params = [new_name, old_name]
-    with DatabaseContextManager("db") as db:
+def update_publisher(old_games_published, new_games_published):
+    query = """UPDATE Publishers
+                SET games_published = ?
+                WHERE games_published = ?"""
+    params = [new_games_published, old_games_published]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def delete_product(product_id: int):
-    query = """DELETE FROM Products
-                WHERE product_id = ?"""
-    params = [product_id]
-    with DatabaseContextManager("db") as db:
+def delete_publisher(publisher_id: int):
+    query = """DELETE FROM Publishers
+                WHERE publisher_id = ?"""
+    params = [publisher_id]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-# -----------------------Orders----------------------
-def create_order(customer_id: int, product_id):
-    query = """INSERT INTO Orders(customer_id, product_id) VALUES(?,?)"""
-    params = [customer_id, product_id]
-    with DatabaseContextManager("db") as db:
+# -----------------------Games-----------------------
+def create_game(publisher_id: int, studio_id: int, game_name: str, genre: str):
+    query = """INSERT INTO Games(publisher_id, studio_id, game_name, genre) VALUES(?,?,?,?)"""
+    params = [publisher_id, studio_id, game_name, genre]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def get_games():
+    query = """SELECT * FROM Games"""
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query)
+        for record in db.fetchall():
+            print(record)
+            print("------------------------------------------------------")
+
+
+def update_game(old_game_name, new_game_name):
+    query = """UPDATE Games
+                SET game_name = ?
+                WHERE game_name = ?"""
+    params = [new_game_name, old_game_name]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def delete_game(game_id: int):
+    query = """DELETE FROM Games
+                WHERE game_id = ?"""
+    params = [game_id]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def get_full_games(game_id):
+    query = """SELECT game_id, game_name, genre, studio_name, employee_count, publisher_name, games_published FROM Games
+    JOIN Publishers
+    ON Games.publisher_id = Publishers.publisher_id
+    JOIN Studios
+    ON Games.studio_id = Studios.studio_id
+    WHERE game_id=?"""
+    params = [game_id]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+        for record in db.fetchall():
+            print(record)
+            print("------------------------------------------------------")
+
+
+# -----------------------Wallets----------------------
+def create_wallet(payment_method: str, balance: int):
+    query = """INSERT INTO Wallets(payment_method, balance) VALUES(?,?)"""
+    params = [payment_method, balance]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def get_wallets():
+    query = """SELECT * FROM Wallets"""
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query)
+        for record in db.fetchall():
+            print(record)
+            print("------------------------------------------------------")
+
+
+def update_wallet(old_balance, new_balance):
+    query = """UPDATE Wallets
+                SET balance = ?
+                WHERE balance = ?"""
+    params = [new_balance, old_balance]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def delete_wallet(wallet_id: int):
+    query = """DELETE FROM Wallets
+                WHERE wallet_id = ?"""
+    params = [wallet_id]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+# -----------------------Users-----------------------
+def create_user(wallet_id: int, user_name: str, user_level: int, games_owned: int):
+    query = """INSERT INTO Users(wallet_id, user_name, user_level, games_owned) VALUES(?,?,?,?)"""
+    params = [wallet_id, user_name, user_level, games_owned]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def get_users():
+    query = """SELECT * FROM Users"""
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query)
+        for record in db.fetchall():
+            print(record)
+            print("------------------------------------------------------")
+
+
+def update_user(old_user_level, new_user_level):
+    query = """UPDATE Users
+                SET user_level = ?
+                WHERE user_level = ?"""
+    params = [new_user_level, old_user_level]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def delete_user(user_id: int):
+    query = """DELETE FROM Users
+                WHERE user_id = ?"""
+    params = [user_id]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+
+
+def get_full_users(user_id):
+    query = """SELECT user_id, payment_method, balance, user_name, user_level, games_owned FROM Users
+    JOIN Wallets
+    ON Users.wallet_id = Wallets.wallet_id
+    WHERE user_id=?"""
+    params = [user_id]
+    with DatabaseContextManager("Db.db") as db:
+        db.execute(query, params)
+        for record in db.fetchall():
+            print(record)
+            print("------------------------------------------------------")
+
+# ----------------------Orders-----------------------
+def create_order(game_id: int, user_id: int, discount: int, price: int):
+    query = """INSERT INTO Orders(game_id, user_id, discount, price) VALUES(?,?,?,?)"""
+    params = [game_id, user_id, discount, price]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
 def get_orders():
     query = """SELECT * FROM Orders"""
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query)
         for record in db.fetchall():
             print(record)
             print("------------------------------------------------------")
 
 
-def update_order(old_product_id, new_product_id):
+def update_order(old_discount, new_discount):
     query = """UPDATE Orders
-                SET product_id = ?
-                WHERE product_id = ?"""
-    params = [new_product_id, old_product_id]
-    with DatabaseContextManager("db") as db:
+                SET discount = ?
+                WHERE discount = ?"""
+    params = [new_discount, old_discount]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def delete_order(customer_id: int):
+def delete_order(order_id: int):
     query = """DELETE FROM Orders
-                WHERE customer_id = ?"""
-    params = [customer_id]
-    with DatabaseContextManager("db") as db:
+                WHERE order_id = ?"""
+    params = [user_id]
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
 
 
-def get_full_order(order_id):
-    query = """SELECT order_id, first_name, second_name amount_spend, name, price, description FROM Orders
-    JOIN Customers
-    ON Orders.customer_id = Customers.customer_id
-    JOIN Products
-    ON Orders.product_id = Products.product_id
+def get_full_orders(order_id):
+    query = """SELECT order_id, game_name, genre, studio_name, employee_count, publisher_name, games_published, payment_method, balance, user_name, user_level, games_owned, discount, price FROM Orders
+    JOIN Games
+    ON Orders.game_id = Games.game_id
+    JOIN Users
+    ON Orders.user_id = Users.user_id
+    JOIN Wallets
+    ON Users.wallet_id = Wallets.wallet_id
+    JOIN Publishers
+    ON Games.publisher_id = Publishers.publisher_id
+    JOIN Studios
+    ON Games.studio_id = Studios.studio_id
     WHERE order_id=?"""
     params = [order_id]
-    with DatabaseContextManager("db") as db:
+    with DatabaseContextManager("Db.db") as db:
         db.execute(query, params)
         for record in db.fetchall():
             print(record)
             print("------------------------------------------------------")
 
 
-create_table_customers()
-create_customers("Milly", "Tomson", 221)
-create_customers("Dylan", "Ether", 24)
-create_customers("Gabe", "Newell", 570)
-
-create_table_products()
-create_product("Pc", 2000, "Gaming Pc")
-create_product("Cat", 100, "Living cat")
-create_product("Wheels", 20, "Wheels 4 u")
-
+#Creating All Tables In Specific Order:
+create_table_studios()
+create_table_publishers()
+create_table_games()
+create_table_wallets()
+create_table_users()
 create_table_orders()
 
-create_order(1, 2)
-create_order(2, 3)
-create_order(3, 1)
+def insert_dummy_data(x: bool):
+    if (x == True):
+        create_studio("Gearbox", 300)
+        create_publisher("2K Games", 393)
+        create_game(1, 1, "Borderlands 3", "FPS-Looter")
+        create_studio("Raven Software", 239)
+        create_publisher("Activision", 1430)
+        create_game(2, 2, "COD: Modern Warfare", "FPS")
+        create_studio("Visceral Games", 80)
+        create_publisher("Electronic Arts", 2687)
+        create_game(3, 3, "Battlefield 1", "FPS")
+        create_studio("Valve", 360)
+        create_publisher("Sierra Ent.", 591)
+        create_game(4, 4, "Half-Life", "Action")
+        create_wallet("Paypal", 200)
+        create_user(1, "Milly", 22, 350)
+        create_wallet("BTC", 350)
+        create_user(2, "Dylan", 14, 200)
+        create_wallet("Paypal", 3000)
+        create_user(3, "Haley", 7, 100)
+        create_wallet("VISA", 750)
+        create_user(4, "Gabe", 47, 860)
+        create_order(1, 1, 50, 8)
+        create_order(2, 2, 10, 120)
+        create_order(3, 3, 15, 90)
+        create_order(4, 4, 5, 25)
 
 
-print("-----------------------Customers-------------------")
-get_customers()
-print("-----------------------Products--------------------")
-get_products()
-print("-----------------------Orders----------------------")
+#If there's no data change to True else keep it False:
+insert_dummy_data(False)
+
+
+
+#Printing Everything to Console:
+print("////////////////////////Studios///////////////////////")
+get_studios()
+print("///////////////////////Publishers/////////////////////")
+get_publishers()
+print("/////////////////////////Games////////////////////////")
+get_games()
+print("///////////////////////Full_Games/////////////////////")
+get_full_games(4)
+print("////////////////////////Wallets///////////////////////")
+get_wallets()
+print("/////////////////////////Users////////////////////////")
+get_users()
+print("///////////////////////Full_Users/////////////////////")
+get_full_users(4)
+print("////////////////////////Orders////////////////////////")
 get_orders()
-print("---------------------Full_Orders-------------------")
-get_full_order(5)
+print("//////////////////////Full_Orders/////////////////////")
+get_full_orders(4)
